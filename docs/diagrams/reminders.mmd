@@ -1,0 +1,18 @@
+sequenceDiagram
+  autonumber
+  participant You
+  participant RN as Reminder note
+  participant Main as Electron main (scheduler)
+  participant Cat as Cat head
+  participant OS as Windows notification
+  You->>RN: New note, Reminder type, set date and time
+  RN->>Main: saved (store:saveAll)
+  loop every 15 s, after each save, on wake
+    Main->>Main: pendingReminders(tasks, ledger, now)
+  end
+  Main-->>Cat: 5 minutes before: "Psst, coming up in a few minutes"
+  Main-->>OS: "Due in 5 min"
+  Main-->>Cat: At the deadline: overdue bubble + badge
+  Main-->>OS: "Due now"
+  You->>Cat: Done, Open or Dismiss
+  Note over Main: each stage recorded in the ledger,<br/>so nothing fires twice

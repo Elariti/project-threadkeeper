@@ -1,0 +1,31 @@
+flowchart TD
+  Q["1 · Project + research question"] --> C
+  subgraph C["2 · Capture sources"]
+    direction LR
+    C1["Text-based PDF"]
+    C2["Paste text"]
+    C3["Find papers<br/>OpenAlex / Crossref<br/>(abstract or open-access PDF)"]
+    C4["Sidecar note → item"]
+  end
+  C --> E["3 · Extract (AI)<br/>claims · findings · methods · limitations · questions"]
+  E --> V{"Quote found verbatim<br/>on that page?"}
+  V -- "no" --> X["Quote removed;<br/>item marked AI interpretation"]
+  V -- "yes" --> S{"Does the quote cover<br/>what the item says?"}
+  S -- "fully" --> SS["Source-stated"]
+  S -- "partly" --> PS["Partly sourced<br/>(reason shown)"]
+  SS --> M
+  PS --> M
+  X --> M
+  M["4 · Rings map<br/>source in the middle · claims & findings ring · everything else outside"]
+  M --> T["5 · Find threads (AI)<br/>cross-paper pairs first · tension cues · per-pair reasoning"]
+  T --> CK["Second, critical AI reading<br/>keep · fix type/direction · drop"]
+  CK --> R{"You review each thread"}
+  R -- "Stitch / Edit / Swap" --> ST["Stitched thread<br/>(part of your argument)"]
+  R -- "Investigate" --> I["Context table<br/>population · definitions · conditions · data · outcomes"]
+  I --> ST
+  R -- "Dismiss" --> D["Dismissed<br/>(never re-proposed)"]
+  ST --> G["6 · Gaps"]
+  ST --> O["7 · Outline<br/>built only from stitched threads"]
+  ST --> A["8 · Ask the map<br/>cited answers"]
+  O --> EX["9 · Export Markdown<br/>provenance · quotes · review summary"]
+  NEW["New paper arrives"] -. "Thread Shift:<br/>possibly contested items flagged" .-> R

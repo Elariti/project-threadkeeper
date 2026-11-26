@@ -1,0 +1,38 @@
+flowchart TB
+  subgraph PC["Your computer (local-first: everything is stored here)"]
+    direction TB
+    subgraph R["Renderer · React + Vite"]
+      direction LR
+      SIDE["<b>Sidecar</b><br/>cat head + reminder bubble<br/>notes: text · checklist · reminder<br/>research · decision · screenshot · voice · video<br/>AI Inbox"]
+      DESK["<b>Research Desk</b><br/>rings map (self-organising)<br/>List · Threads · Gaps · Outline · Ask · History<br/>source viewer · Find papers<br/>useResearch store: provenance · undo · checked pairs"]
+    end
+    PRE["<b>preload.cjs</b> · contextBridge → window.threadkeeper"]
+    subgraph M["Electron main process"]
+      direction LR
+      WIN["<b>Window</b><br/>modes: cat head · notes · detail · desk<br/>cursor-follow drag · position memory<br/>tray · global shortcuts"]
+      REM["<b>Reminders</b><br/>scheduler: 5 min before + overdue<br/>sent-ledger (no repeats)<br/>Windows notifications (AUMID)"]
+      DATA[("<b>Local data</b><br/>electron-store JSON<br/>attachments · source text pages")]
+    end
+    SIDE <--> PRE
+    DESK <--> PRE
+    PRE <-- "IPC" --> WIN
+    PRE <-- "IPC" --> DATA
+  end
+  subgraph BE["Optional AI backend · FastAPI on 127.0.0.1:8000"]
+    direction LR
+    API["<b>/research-map/*</b><br/>pdf/parse · extract · discover-threads<br/>investigate-thread · explore-gaps<br/>generate-outline · ask · fetch-fulltext"]
+    GUARD["<b>Guard rails</b><br/>verbatim-quote check · support check<br/>invented-ID rejection · JSON salvage<br/>second critical reading of threads"]
+    LLM["<b>llm.py</b><br/>retries · fallback model<br/>token budget"]
+    API --> GUARD --> LLM
+  end
+  subgraph EXT["External services"]
+    direction LR
+    NEB["Nebius Token Factory<br/>Nemotron"]
+    OA["OpenAlex · Crossref<br/>paper search, no key"]
+    TAV["Tavily<br/>optional web search"]
+  end
+  DESK -- "HTTP, only when you press an AI action" --> API
+  DESK -- "direct, no backend needed" --> OA
+  LLM --> NEB
+  API -. "/research" .-> TAV
+  REM -- "reminder:fired" --> SIDE
